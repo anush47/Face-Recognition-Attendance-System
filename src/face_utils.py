@@ -10,12 +10,6 @@ HAAR_CASCADE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'haarc
 if not os.path.exists(HAAR_CASCADE_PATH):
     print("Downloading haarcascade_frontalface_default.xml...")
     try:
-        # This is a placeholder. In a real scenario, you'd download it from a reliable source.
-        # For simplicity, I'll assume it's manually placed or downloaded by the user.
-        # A more robust solution would involve using requests to download from GitHub or similar.
-        # For now, I'll just create an empty file and print a message.
-        # You would typically download from: https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml
-        # For this example, I'll just create a dummy file and instruct the user.
         with open(HAAR_CASCADE_PATH, 'w') as f:
             f.write("") # Create an empty file as a placeholder
         print(f"Please download 'haarcascade_frontalface_default.xml' and place it in the 'data/' directory.")
@@ -33,39 +27,40 @@ def detect_faces(image):
     return faces, gray
 
 def train_recognizer():
-    """Trains the LBPHFaceRecognizer with registered faces and returns an ID-to-name map."""
+    """Trains the LBPHFaceRecognizer with registered faces and returns an ID-to-employee_info map."""
     registered_faces_data = load_face_data()
     faces = []
     ids = []
-    name_to_id = {}
-    id_to_name = {}
-    current_id = 0
+    employee_id_to_internal_id = {}
+    internal_id_to_employee_info = {}
+    current_internal_id = 0
 
     for entry in registered_faces_data:
+        employee_id = entry['id']
         name = entry['name']
-        face_image = entry['image'] # This is already grayscale from data_manager
+        face_image = entry['image']
 
-        if name not in name_to_id:
-            name_to_id[name] = current_id
-            id_to_name[current_id] = name
-            current_id += 1
+        if employee_id not in employee_id_to_internal_id:
+            employee_id_to_internal_id[employee_id] = current_internal_id
+            internal_id_to_employee_info[current_internal_id] = {'id': employee_id, 'name': name}
+            current_internal_id += 1
         
         faces.append(face_image)
-        ids.append(name_to_id[name])
+        ids.append(employee_id_to_internal_id[employee_id])
 
     if len(faces) > 0:
         recognizer.train(faces, np.array(ids))
-        return id_to_name
+        return internal_id_to_employee_info
     return {}
 
-def recognize_face(face_image, id_to_name_map):
+def recognize_face(face_image, internal_id_to_employee_info_map):
     """Recognizes a face using the trained LBPHFaceRecognizer."""
-    if not id_to_name_map:
-        return "Unknown", 0 # No trained data
+    if not internal_id_to_employee_info_map:
+        return {'id': 'Unknown', 'name': 'Unknown'}, 0 # No trained data
 
-    id, confidence = recognizer.predict(face_image)
+    internal_id, confidence = recognizer.predict(face_image)
     
-    if id in id_to_name_map:
-        name = id_to_name_map[id]
-        return name, confidence
-    return "Unknown", confidence
+    if internal_id in internal_id_to_employee_info_map:
+        employee_info = internal_id_to_employee_info_map[internal_id]
+        return employee_info, confidence
+    return {'id': 'Unknown', 'name': 'Unknown'}, confidence
