@@ -58,7 +58,7 @@ This is a simple desktop application for tracking attendance using face recognit
     From the root directory of the project (`AttendanceApp/`), run:
 
     ```bash
-    python -m src.main
+    python src/main.py
     ```
 
 2.  **Admin Login:**

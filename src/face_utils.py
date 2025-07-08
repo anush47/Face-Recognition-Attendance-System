@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import os
-from src.data_manager import load_face_data
+from data_manager import load_face_data
 
 # Path to Haar cascade XML file
 HAAR_CASCADE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'haarcascade_frontalface_default.xml')

@@ -16,3 +16,4 @@
 - [2025-07-09 13:30:00] Task: Reverted attendance log handling to text file format and added "Save as CSV" button to attendance report. Modified `src/data_manager.py` and `src/main.py`.
 - [2025-07-09 13:45:00] Task: Made the main window resizable and arranged the camera preview and buttons side-by-side for a better layout. Modified `src/main.py`.
 - [2025-07-09 14:00:00] Task: Updated `README.md` to reflect all new features and changes. Modified `README.md`.
+- [2025-07-09 14:05:00] Task: Modified imports in `src/main.py` and `src/face_utils.py` to allow direct execution of `src/main.py` without treating `src` as a package.

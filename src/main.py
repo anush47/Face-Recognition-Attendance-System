@@ -2,12 +2,10 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
 import cv2
 from PIL import Image, ImageTk
-import numpy as np
-import os
 from datetime import datetime
 
-from .face_utils import detect_faces, train_recognizer, recognize_face
-from .data_manager import delete_attendance_log, edit_attendance_log, save_attendance_logs_to_csv, save_face_data, load_face_data, delete_face_data, get_attendance_logs, load_config, save_config, update_face_data
+from face_utils import detect_faces, train_recognizer, recognize_face
+from data_manager import delete_attendance_log, edit_attendance_log, save_attendance_logs_to_csv, save_face_data, load_face_data, delete_face_data, get_attendance_logs, load_config, save_config, update_face_data
 
 class MainApplication:
     def __init__(self, master):
