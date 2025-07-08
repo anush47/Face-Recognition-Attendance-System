@@ -4,41 +4,46 @@ This is a simple desktop application for tracking attendance using face recognit
 
 ## Features
 
-*   **Face Registration:** Capture a user's face, extract facial embeddings, and store them with the user's name and a unique employee ID.
-*   **Face Recognition (Attendance):** Capture a live video feed, detect faces, recognize registered faces, and record attendance with employee ID and a precise timestamp.
-*   **Admin Panel:** Secure login for administrators to manage various aspects of the system.
-*   **Manage Registered Faces:** Add, edit (name), remove, and view registered employee faces.
-*   **Attendance Report Dashboard:** View, filter, edit, and delete attendance log entries.
-*   **Export Attendance Data:** Save attendance reports to a CSV file with employee ID and timestamp.
-*   **Camera Control:** Stop and resume the camera feed as needed, with proper resource management.
-*   **Configurable Settings:** Adjust application settings like minimum attendance capture interval.
-*   **Improved User Interface:** Resizable window with a clean layout, displaying the camera feed and controls side-by-side, and clear visual feedback.
+- **Face Registration:** Capture a user's face, extract facial embeddings, and store them with the user's name and a unique employee ID.
+- **Face Recognition (Attendance):** Capture a live video feed, detect faces, recognize registered faces, and record attendance with employee ID and a precise timestamp.
+- **Admin Panel:** Secure login for administrators to manage various aspects of the system.
+- **Manage Registered Faces:** Add, edit (name), remove, and view registered employee faces.
+- **Attendance Report Dashboard:** View, filter, edit, and delete attendance log entries.
+- **Export Attendance Data:** Save attendance reports to a CSV file with employee ID and timestamp.
+- **Camera Control:** Stop and resume the camera feed as needed, with proper resource management.
+- **Configurable Settings:** Adjust application settings like minimum attendance capture interval.
+- **Improved User Interface:** Resizable window with a clean layout, displaying the camera feed and controls side-by-side, and clear visual feedback.
 
 ## Installation
 
 1.  **Clone the repository:**
+
     ```bash
     git clone <repository_url>
     cd AttendanceApp
     ```
+
     (Replace `<repository_url>` with the actual URL of your repository if you are cloning from a remote source. If you downloaded the files directly, navigate to the `AttendanceApp` directory.)
 
 2.  **Create a virtual environment (recommended):**
+
     ```bash
     python -m venv venv
     ```
 
 3.  **Activate the virtual environment:**
-    *   **Windows:**
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   **macOS/Linux:**
-        ```bash
-    source venv/bin/activate
-        ```
+
+    - **Windows:**
+      ```bash
+      .\venv\Scripts\activate
+      ```
+    - **macOS/Linux:**
+      ```bash
+      source venv/bin/activate
+      ```
 
 4.  **Install dependencies:**
+
     ```bash
     pip install -r requirements.txt
     ```
@@ -51,36 +56,42 @@ This is a simple desktop application for tracking attendance using face recognit
 
 1.  **Run the application:**
     From the root directory of the project (`AttendanceApp/`), run:
+
     ```bash
     python -m src.main
     ```
 
 2.  **Admin Login:**
-    *   Click "Admin Login" to access administrative features.
-    *   Default credentials: Username `admin`, Password `admin` (can be changed in Admin Settings).
+
+    - Click "Admin Login" to access administrative features.
+    - Default credentials: Username `admin`, Password `admin` (can be changed in Admin Settings).
 
 3.  **Register Faces:**
-    *   Log in as Admin.
-    *   Click the "Register Face" button.
-    *   Enter a unique Employee ID and the Name of the person.
-    *   Ensure only one face is in the camera frame and click "Capture and Register".
+
+    - Log in as Admin.
+    - Click the "Register Face" button.
+    - Enter a unique Employee ID and the Name of the person.
+    - Ensure only one face is in the camera frame and click "Capture and Register".
 
 4.  **Mark Attendance:**
-    *   Click the "Mark Attendance" button.
-    *   The application will attempt to recognize faces in the camera feed.
-    *   If a registered face is recognized, attendance will be marked and logged to `attendance_log.txt`.
+
+    - Click the "Mark Attendance" button.
+    - The application will attempt to recognize faces in the camera feed.
+    - If a registered face is recognized, attendance will be marked and logged to `attendance_log.txt`.
 
 5.  **Manage Faces:**
-    *   Log in as Admin.
-    *   Click "Manage Faces" to add, edit, remove, or view registered faces.
+
+    - Log in as Admin.
+    - Click "Manage Faces" to add, edit, remove, or view registered faces.
 
 6.  **View Reports:**
-    *   Log in as Admin.
-    *   Click "View Reports" to access the Attendance Report Dashboard.
-    *   You can filter logs by Name/ID, edit existing log entries, delete log entries, and save the report as a CSV file.
+
+    - Log in as Admin.
+    - Click "View Reports" to access the Attendance Report Dashboard.
+    - You can filter logs by Name/ID, edit existing log entries, delete log entries, and save the report as a CSV file.
 
 7.  **Camera Control:**
-    *   Use the "Stop Camera" and "Resume Camera" buttons to control the video feed.
+    - Use the "Stop Camera" and "Resume Camera" buttons to control the video feed.
 
 ## Project Structure
 
@@ -107,6 +118,7 @@ AttendanceApp/
 
 ## Notes
 
-*   This application uses `opencv-python` for face detection and recognition. The `LBPHFaceRecognizer` is used for recognition, which is simpler and less accurate than deep learning models. Performance and accuracy will depend on lighting, face angles, and the number of registered users.
-*   Attendance records are saved to `attendance_log.txt` in the project root directory in the format `Name - EmployeeID - YYYY-MM-DDTHH:MM:SS.000Z`.
-*   The attendance report can be exported to a CSV file with `employee` (ID) and `time` (timestamp in `YYYY-MM-DDTHH:MM:SS.000Z`) columns.
+- This application uses `opencv-python` for face detection and recognition. The `LBPHFaceRecognizer` is used for recognition, which is simpler and less accurate than deep learning models. Performance and accuracy will depend on lighting, face angles, and the number of registered users.
+- Attendance records are saved to `attendance_log.txt` in the project root directory in the format `Name - EmployeeID - YYYY-MM-DDTHH:MM:SS.000Z`.
+- The attendance report can be exported to a CSV file with `employee` (ID) and `time` (timestamp in `YYYY-MM-DDTHH:MM:SS.000Z`) columns.
+- This application was mainly developed using gemini-cli
