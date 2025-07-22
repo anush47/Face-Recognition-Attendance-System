@@ -126,6 +126,72 @@ export const editAttendanceLog = (oldLog, newLog) => {
     return false;
 };
 
+export const exportAllData = async () => {
+    const registeredFaces = _loadRawFaceData();
+    const config = await loadConfig();
+    const attendanceLogs = getAttendanceLogs();
+
+    // Basic encryption for the admin password
+    const encryptedConfig = {
+        ...config,
+        admin_password: btoa(config.admin_password) 
+    };
+
+    const allData = {
+        registeredFaces,
+        config: encryptedConfig,
+        attendanceLogs,
+    };
+
+    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'attendance_app_backup.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+export const importAllData = (file) => {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            return reject(new Error("No file selected."));
+        }
+
+        if (!window.confirm("Are you sure you want to restore from this backup? This will overwrite all existing data.")) {
+            return reject(new Error("Restore operation cancelled by user."));
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+
+                if (data.registeredFaces && data.config && data.attendanceLogs) {
+                    // Basic decryption for the admin password
+                    const decryptedConfig = {
+                        ...data.config,
+                        admin_password: atob(data.config.admin_password)
+                    };
+
+                    _saveRawFaceData(data.registeredFaces);
+                    localStorage.setItem(CONFIG_KEY, JSON.stringify(decryptedConfig));
+                    localStorage.setItem(ATTENDANCE_LOG_KEY, JSON.stringify(data.attendanceLogs));
+                    resolve("Data restored successfully. The application will now reload.");
+                } else {
+                    reject(new Error("Invalid backup file format."));
+                }
+            } catch (error) {
+                reject(new Error(`Error parsing backup file: ${error.message}`));
+            }
+        };
+        reader.onerror = (error) => {
+            reject(new Error(`Error reading file: ${error.message}`));
+        };
+        reader.readAsText(file);
+    });
+};
+
 export const saveAttendanceLogsToCsv = (logsData) => {
     const headers = "employee,time\n";
     const csvContent = logsData.map(logEntry => {
@@ -154,4 +220,21 @@ export const saveAttendanceLogsToCsv = (logsData) => {
         alert("Your browser does not support downloading files directly. Please copy the content manually.");
         console.log(fullCsv);
     }
+};
+
+export const resetAllData = () => {
+    return new Promise((resolve, reject) => {
+        if (window.confirm("Are you sure you want to reset all data? This action cannot be undone.")) {
+            try {
+                localStorage.removeItem(REGISTERED_FACES_KEY);
+                localStorage.removeItem(CONFIG_KEY);
+                localStorage.removeItem(ATTENDANCE_LOG_KEY);
+                resolve("All data has been reset. The application will now reload.");
+            } catch (error) {
+                reject(new Error(`Error resetting data: ${error.message}`));
+            }
+        } else {
+            reject(new Error("Data reset cancelled by user."));
+        }
+    });
 };

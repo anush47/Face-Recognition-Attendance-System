@@ -12,10 +12,13 @@ import {
   deleteAttendanceLog,
   editAttendanceLog,
   saveAttendanceLogsToCsv,
+  exportAllData,
+  importAllData,
+  resetAllData,
 } from "./dataManager";
 import "./App.css";
 
-const MODEL_URL = "/"; // Models are in the public folder
+const MODEL_URL = import.meta.env.BASE_URL; // Use Vite's base URL to load models
 
 function App() {
   const videoRef = useRef();
@@ -528,6 +531,46 @@ ${selectedLog}`)
     setCameraBorderColor('green');
   };
 
+  const handleExportData = async () => {
+    try {
+      await exportAllData();
+      setStatusMessage("All data exported successfully!");
+      setCameraBorderColor("green");
+    } catch (error) {
+      setStatusMessage(`Error exporting data: ${error.message}`);
+      setCameraBorderColor("red");
+    }
+  };
+
+  const handleImportData = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const message = await importAllData(file);
+      setStatusMessage(message);
+      setCameraBorderColor("green");
+      // Reload the page to apply changes
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (error) {
+      setStatusMessage(`Error importing data: ${error.message}`);
+      setCameraBorderColor("red");
+    }
+  };
+
+  const handleResetData = async () => {
+    try {
+      const message = await resetAllData();
+      setStatusMessage(message);
+      setCameraBorderColor("green");
+      // Reload the page to apply changes
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (error) {
+      setStatusMessage(`Error resetting data: ${error.message}`);
+      setCameraBorderColor("red");
+    }
+  };
+
   const renderContent = () => {
     switch (activeView) {
       case "attendance":
@@ -564,7 +607,7 @@ ${selectedLog}`)
               type="text"
               placeholder="Employee Name"
               value={regName}
-              onChange={(e) => setNewRegName(e.target.value)}
+              onChange={(e) => setRegName(e.target.value)}
             />
             <button
               onClick={handleRegisterFace}
@@ -688,6 +731,18 @@ ${selectedLog}`)
               onChange={(e) => setNewAdminPassword(e.target.value)}
             />
             <button onClick={handleChangeAdminCredentials}>Update Credentials</button>
+
+            <div className="backup-restore-section">
+              <h3>Backup & Restore</h3>
+              <button onClick={handleExportData}>Backup All Data</button>
+              <input type="file" accept=".json" onChange={handleImportData} style={{ display: 'none' }} id="import-file-input" />
+              <label htmlFor="import-file-input" className="button">Restore from Backup</label>
+            </div>
+
+            <div className="reset-data-section">
+              <h3>Reset Data</h3>
+              <button onClick={handleResetData} className="reset-button">Reset All Data</button>
+            </div>
           </div>
         );
       default:
