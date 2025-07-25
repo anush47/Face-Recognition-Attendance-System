@@ -64,7 +64,7 @@ export const updateFaceData = (
 
 export const loadConfig = async (): Promise<AppConfig> => {
   const config = localStorage.getItem(CONFIG_KEY);
-  //console.log(config);
+  console.log(config);
   if (config) {
     const parsedConfig = JSON.parse(config);
     if (parsedConfig.admin_username && parsedConfig.admin_password) {

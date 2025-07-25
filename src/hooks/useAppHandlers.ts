@@ -190,6 +190,35 @@ export const useAppHandlers = ({
 
   const handleSaveAdminSettings = async () => {
     try {
+      const currentConfig = await loadConfig();
+
+      const newMinInterval = Number.parseInt(
+        config.min_capture_interval_minutes.toString()
+      );
+      if (isNaN(newMinInterval) || newMinInterval < 0) {
+        updateStatus(
+          "Minimum capture interval must be a non-negative number.",
+          "warning"
+        );
+        return;
+      }
+      console.log("New min interval:", newMinInterval);
+
+      const updatedConfig = {
+        ...currentConfig,
+        min_capture_interval_minutes: newMinInterval,
+      };
+
+      await saveConfig(updatedConfig);
+      setConfig(updatedConfig);
+      updateStatus("Admin credentials updated successfully!", "success");
+    } catch (error) {
+      updateStatus("Error updating credentials.", "destructive");
+    } finally {
+      setLoading(false);
+    }
+    try {
+      console.log("New min interval:", config);
       const newMinInterval = Number.parseInt(
         config.min_capture_interval_minutes.toString()
       );

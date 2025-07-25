@@ -31,8 +31,6 @@ import {
   Save,
   AlertCircle,
   CheckCircle,
-  ToggleRight,
-  ToggleLeft,
 } from "lucide-react";
 import type { AppConfig, ViewType } from "@/types/types";
 import AdminPanel from "./components/AdminPanel";
@@ -40,6 +38,7 @@ import Header from "./components/Header";
 import { useFaceRecognition } from "./hooks/useFaceRecognition";
 import { useAppHandlers } from "./hooks/useAppHandlers";
 
+import { Switch } from "@/components/ui/switch";
 export default function FaceAttendanceApp() {
   const [activeView, setActiveView] = useState<ViewType>("attendance");
   const [lastAttendanceTime, setLastAttendanceTime] = useState<
@@ -198,16 +197,36 @@ export default function FaceAttendanceApp() {
                       Live Camera Feed
                     </span>
                   </div>
-                  <Badge
-                    variant={cameraStatus.active ? "default" : "secondary"}
-                    className={`${
-                      cameraStatus.active
-                        ? "bg-success-light text-success-dark border-success-DEFAULT"
-                        : "bg-background-dark text-text-DEFAULT border-background-DEFAULT"
-                    }`}
-                  >
-                    {cameraStatus.active ? "Active" : "Inactive"}
-                  </Badge>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between space-x-2">
+                      {adminLoggedIn && (
+                        <>
+                          <Label
+                            htmlFor="realtimeDetection"
+                            className="text-sm font-semibold text-slate-700"
+                          >
+                            Realtime Face Detection
+                          </Label>
+                          <Switch
+                            id="realtimeDetection"
+                            checked={realtimeDetectionEnabled}
+                            onCheckedChange={setRealtimeDetectionEnabled}
+                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-slate-200"
+                          />
+                        </>
+                      )}
+                    </div>
+                    <Badge
+                      variant={cameraStatus.active ? "default" : "secondary"}
+                      className={`${
+                        cameraStatus.active
+                          ? "bg-success-light text-success-dark border-success-DEFAULT"
+                          : "bg-background-dark text-text-DEFAULT border-background-DEFAULT"
+                      }`}
+                    >
+                      {cameraStatus.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -651,7 +670,10 @@ export default function FaceAttendanceApp() {
                       </p>
                     </div>
 
-                    <Tabs defaultValue="general" className="w-full">
+                    <Tabs
+                      defaultValue="general"
+                      className="w-full bg-slate-100"
+                    >
                       <TabsList className="grid w-full grid-cols-3 bg-slate-100 p-1 rounded-xl">
                         <TabsTrigger
                           value="general"
@@ -695,33 +717,6 @@ export default function FaceAttendanceApp() {
                               }
                               className="border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
                             />
-                          </div>
-                          <div className="flex items-center justify-between space-x-2">
-                            <Label
-                              htmlFor="realtimeDetection"
-                              className="text-sm font-semibold text-slate-700"
-                            >
-                              Enable Realtime Face Detection
-                            </Label>
-                            <Button
-                              id="realtimeDetection"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                setRealtimeDetectionEnabled((prev) => !prev)
-                              }
-                              className={`rounded-full p-1 transition-colors duration-200 ${
-                                realtimeDetectionEnabled
-                                  ? "bg-green-500 hover:bg-green-600 text-white"
-                                  : "bg-slate-200 hover:bg-slate-300 text-slate-600"
-                              }`}
-                            >
-                              {realtimeDetectionEnabled ? (
-                                <ToggleRight className="h-6 w-6" />
-                              ) : (
-                                <ToggleLeft className="h-6 w-6" />
-                              )}
-                            </Button>
                           </div>
                           <Button
                             onClick={handleSaveAdminSettings}
