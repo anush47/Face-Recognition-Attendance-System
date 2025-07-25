@@ -139,10 +139,10 @@ export const saveAttendanceLogsToCsv = (logsData: string[]): void => {
     .map((logEntry) => {
       const parts = logEntry.split(" - ");
       if (parts.length >= 3) {
-        const name = parts[0];
+        //const name = parts[0];
         const id = parts[1];
-        const timestamp = parts.slice(2).join(" - ");
-        return `"${name} (ID: ${id})","${timestamp}"`;
+        const timestamp = parts.slice(2).join(" - ").replace(/Z$/, "");
+        return `${id},${timestamp}`;
       }
       return `"${logEntry}",""`;
     })
