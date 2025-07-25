@@ -1,5 +1,6 @@
 import type { RegisteredFace, AppConfig } from "@/types/types";
 import { initialConfig } from "./initial-config";
+import { hashPassword } from "./authUtils";
 
 const REGISTERED_FACES_KEY = "registered_faces";
 const CONFIG_KEY = "app_config";
@@ -61,29 +62,25 @@ export const updateFaceData = (
   return updated;
 };
 
-async function hashPassword(password: string): Promise<string> {
-  const textEncoder = new TextEncoder();
-  const data = textEncoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
 export const loadConfig = async (): Promise<AppConfig> => {
   const config = localStorage.getItem(CONFIG_KEY);
+  //console.log(config);
   if (config) {
-    return JSON.parse(config);
-  } else {
-    const hashedInitialPassword = await hashPassword(
-      initialConfig.admin_password
-    );
-    const newConfig = {
-      ...initialConfig,
-      admin_password: hashedInitialPassword,
-    };
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
-    return newConfig;
+    const parsedConfig = JSON.parse(config);
+    if (parsedConfig.admin_username && parsedConfig.admin_password) {
+      return parsedConfig;
+    }
   }
+  const hashedInitialPassword = await hashPassword(
+    initialConfig.admin_password
+  );
+  //console.log(hashedInitialPassword);
+  const newConfig = {
+    ...initialConfig,
+    admin_password: hashedInitialPassword,
+  };
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
+  return newConfig;
 };
 
 export const saveConfig = async (configData: AppConfig): Promise<void> => {

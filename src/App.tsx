@@ -31,6 +31,8 @@ import {
   Save,
   AlertCircle,
   CheckCircle,
+  ToggleRight,
+  ToggleLeft,
 } from "lucide-react";
 import type { AppConfig, ViewType } from "@/types/types";
 import AdminPanel from "./components/AdminPanel";
@@ -45,6 +47,8 @@ export default function FaceAttendanceApp() {
   >({});
   const [config, setConfig] = useState<AppConfig>({} as AppConfig);
   const [_loading, setLoading] = useState(false);
+  const [realtimeDetectionEnabled, setRealtimeDetectionEnabled] =
+    useState(false);
 
   // Form states
   const [regEmployeeId, setRegEmployeeId] = useState("");
@@ -72,6 +76,7 @@ export default function FaceAttendanceApp() {
     config,
     lastAttendanceTime,
     setLastAttendanceTime,
+    realtimeDetectionEnabled,
   });
 
   const {
@@ -142,18 +147,18 @@ export default function FaceAttendanceApp() {
   const getBorderColorClass = () => {
     switch (cameraStatus.borderColor) {
       case "success":
-        return "border-green-400 shadow-green-200 shadow-lg";
+        return "border-success-DEFAULT shadow-success-light shadow-lg";
       case "warning":
-        return "border-yellow-400 shadow-yellow-200 shadow-lg";
+        return "border-warning-DEFAULT shadow-warning-light shadow-lg";
       case "destructive":
-        return "border-red-400 shadow-red-200 shadow-lg";
+        return "border-destructive-DEFAULT shadow-destructive-light shadow-lg";
       default:
-        return "border-slate-300 shadow-slate-200 shadow-lg";
+        return "border-background-dark shadow-background-DEFAULT shadow-lg";
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-background-light via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
@@ -182,14 +187,14 @@ export default function FaceAttendanceApp() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Camera Section - Enhanced */}
-            <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <Card className="border-0 shadow-lg bg-background-DEFAULT/90 backdrop-blur-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100">
-                      <Camera className="h-5 w-5 text-indigo-600" />
+                    <div className="p-2 rounded-lg bg-primary-light/20">
+                      <Camera className="h-5 w-5 text-primary-DEFAULT" />
                     </div>
-                    <span className="text-xl font-semibold text-slate-800">
+                    <span className="text-xl font-semibold text-text-dark">
                       Live Camera Feed
                     </span>
                   </div>
@@ -197,8 +202,8 @@ export default function FaceAttendanceApp() {
                     variant={cameraStatus.active ? "default" : "secondary"}
                     className={`${
                       cameraStatus.active
-                        ? "bg-green-100 text-green-800 border-green-200"
-                        : "bg-slate-100 text-slate-600 border-slate-200"
+                        ? "bg-success-light text-success-dark border-success-DEFAULT"
+                        : "bg-background-dark text-text-DEFAULT border-background-DEFAULT"
                     }`}
                   >
                     {cameraStatus.active ? "Active" : "Inactive"}
@@ -212,7 +217,7 @@ export default function FaceAttendanceApp() {
                   >
                     <video
                       ref={videoRef}
-                      onPlay={handleVideoPlay}
+                      onPlay={() => handleVideoPlay(realtimeDetectionEnabled)}
                       className="w-full h-auto max-h-[400px] object-cover rounded-xl"
                       muted
                       playsInline
@@ -256,6 +261,30 @@ export default function FaceAttendanceApp() {
                       Stop Camera
                     </Button>
                   </div>
+                  {activeView === "attendance" && (
+                    <div className="mt-4 text-center">
+                      <Button
+                        onClick={handleMarkAttendance}
+                        disabled={
+                          !cameraStatus.active || !modelsLoaded || loading
+                        }
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 text-lg shadow-lg"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="mr-3 h-5 w-5" />
+                            Mark Attendance
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -270,31 +299,11 @@ export default function FaceAttendanceApp() {
                         <CheckCircle className="h-8 w-8 text-indigo-600" />
                       </div>
                       <h2 className="text-3xl font-bold text-slate-800 mb-2">
-                        Mark Attendance
+                        Attendance Overview
                       </h2>
                       <p className="text-slate-600 mb-6">
-                        Position your face in front of the camera
+                        Registered employees and attendance status
                       </p>
-                      <Button
-                        onClick={handleMarkAttendance}
-                        disabled={
-                          !cameraStatus.active || !modelsLoaded || loading
-                        }
-                        size="lg"
-                        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 text-lg shadow-lg"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-3 h-5 w-5" />
-                            Mark Attendance
-                          </>
-                        )}
-                      </Button>
                     </div>
                     {registeredFaces.length > 0 && (
                       <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-6">
@@ -686,6 +695,33 @@ export default function FaceAttendanceApp() {
                               }
                               className="border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
                             />
+                          </div>
+                          <div className="flex items-center justify-between space-x-2">
+                            <Label
+                              htmlFor="realtimeDetection"
+                              className="text-sm font-semibold text-slate-700"
+                            >
+                              Enable Realtime Face Detection
+                            </Label>
+                            <Button
+                              id="realtimeDetection"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                setRealtimeDetectionEnabled((prev) => !prev)
+                              }
+                              className={`rounded-full p-1 transition-colors duration-200 ${
+                                realtimeDetectionEnabled
+                                  ? "bg-green-500 hover:bg-green-600 text-white"
+                                  : "bg-slate-200 hover:bg-slate-300 text-slate-600"
+                              }`}
+                            >
+                              {realtimeDetectionEnabled ? (
+                                <ToggleRight className="h-6 w-6" />
+                              ) : (
+                                <ToggleLeft className="h-6 w-6" />
+                              )}
+                            </Button>
                           </div>
                           <Button
                             onClick={handleSaveAdminSettings}

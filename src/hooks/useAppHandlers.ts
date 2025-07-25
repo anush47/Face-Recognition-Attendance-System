@@ -68,6 +68,7 @@ export const useAppHandlers = ({
     try {
       const currentConfig = await loadConfig();
       const hashedPassword = await hashPassword(adminPassword);
+      console.log(currentConfig.admin_password, hashedPassword);
 
       if (
         adminUsername === currentConfig.admin_username &&

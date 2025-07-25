@@ -1,4 +1,5 @@
 export const hashPassword = async (password: string): Promise<string> => {
+  // return password;
   const textEncoder = new TextEncoder();
   const data = textEncoder.encode(password);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);

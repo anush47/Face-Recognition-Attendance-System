@@ -16,12 +16,14 @@ interface UseFaceRecognitionProps {
   setLastAttendanceTime: React.Dispatch<
     React.SetStateAction<Record<string, Date>>
   >;
+  realtimeDetectionEnabled: boolean;
 }
 
 export const useFaceRecognition = ({
   config,
   lastAttendanceTime,
   setLastAttendanceTime,
+  realtimeDetectionEnabled,
 }: UseFaceRecognitionProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -137,14 +139,14 @@ export const useFaceRecognition = ({
     updateStatus("Camera stopped.", "default");
   };
 
-  const handleVideoPlay = () => {
+  const handleVideoPlay = (realtimeEnabled: boolean) => {
     if (!canvasRef.current || !videoRef.current) return;
 
     if (
       videoRef.current.videoWidth === 0 ||
       videoRef.current.videoHeight === 0
     ) {
-      setTimeout(handleVideoPlay, 100);
+      setTimeout(() => handleVideoPlay(realtimeEnabled), 1000);
       return;
     }
 
@@ -164,19 +166,6 @@ export const useFaceRecognition = ({
         return;
       }
 
-      if (
-        videoRef.current.videoWidth === 0 ||
-        videoRef.current.videoHeight === 0
-      ) {
-        return;
-      }
-
-      const detections = await faceapi
-        .detectAllFaces(videoRef.current, new faceapi.SsdMobilenetv1Options())
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
       const context = canvasRef.current?.getContext("2d");
       if (context && canvasRef.current) {
         context.clearRect(
@@ -185,22 +174,37 @@ export const useFaceRecognition = ({
           canvasRef.current.width,
           canvasRef.current.height
         );
-        faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-        faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
+      }
 
-        if (internalLabeledFaceDescriptors) {
-          const faceMatcher = new faceapi.FaceMatcher(
-            internalLabeledFaceDescriptors,
-            0.6
-          );
-          resizedDetections.forEach((detection) => {
-            const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-            const box = detection.detection.box;
-            const drawBox = new faceapi.draw.DrawBox(box, {
-              label: bestMatch.toString(),
+      if (realtimeEnabled) {
+        const detections = await faceapi
+          .detectAllFaces(videoRef.current, new faceapi.SsdMobilenetv1Options())
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+
+        const resizedDetections = faceapi.resizeResults(
+          detections,
+          displaySize
+        );
+
+        if (context && canvasRef.current) {
+          faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
+          faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
+
+          if (internalLabeledFaceDescriptors) {
+            const faceMatcher = new faceapi.FaceMatcher(
+              internalLabeledFaceDescriptors,
+              0.6
+            );
+            resizedDetections.forEach((detection) => {
+              const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+              const box = detection.detection.box;
+              const drawBox = new faceapi.draw.DrawBox(box, {
+                label: bestMatch.toString(),
+              });
+              drawBox.draw(canvasRef.current!);
             });
-            drawBox.draw(canvasRef.current!);
-          });
+          }
         }
       }
     }, 100);
