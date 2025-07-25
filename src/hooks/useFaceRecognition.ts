@@ -76,7 +76,7 @@ export const useFaceRecognition = ({
       await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
       setModelsLoaded(true);
       updateStatus("Models loaded. Loading configuration...", "default");
-
+      console.log("Real time detection: ", realtimeDetectionEnabled);
       loadRegisteredFaces();
     } catch (error) {
       console.error("Error initializing app:", error);
